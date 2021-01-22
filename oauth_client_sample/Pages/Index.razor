@@ -1,0 +1,49 @@
+﻿@page "/"
+@using Define;
+@using Data;
+@using Microsoft.AspNetCore.Mvc.Infrastructure
+@using oauth_client_sample.util
+@inject NavigationManager NavManager
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app. <br/>
+
+<button class="btn btn-primary" @onclick="RedirectAuthorize">Authorize</button>
+
+<br/>
+
+@if (_tokenInfo != null)
+{
+    <p>Token : @_tokenInfo.AccessToken </p>   
+}
+<br/>
+@if (_user != null)
+{   
+    <p>ID : @_user.Id</p>
+    <p>Name : @_user.Name</p>
+    <p>Email : @_user.Email</p>
+}
+
+@code {
+    AccessTokenInfo _tokenInfo;
+    User _user;
+    
+    private void RedirectAuthorize()
+    {
+        var url = Define.GetAuthorizeUrl();
+        NavManager.NavigateTo(url);
+    }
+
+    protected override void OnInitialized()
+    {
+        _tokenInfo = TokenInstance.Instance.GetToken();
+        if (_tokenInfo != null && _tokenInfo.AccessToken != "")
+        {
+            this._user = HttpSupport.SendHttp<User>(Define.GetUserInfoUrl(), "GET", "", _tokenInfo.AccessToken, "user");
+        }
+        
+        base.OnInitialized();
+    }
+
+}

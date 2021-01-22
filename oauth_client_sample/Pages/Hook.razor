@@ -1,0 +1,26 @@
+@page "/hook"
+<h3>hook</h3>
+@using oauth_client_sample.util
+@using oauth_client_sample.Define
+
+
+<input type="text" @bind="url" placeholder="url">
+<input type="text" @bind="content" placeholder="content">
+<button @onclick="Send">Send</button>
+  @if(response != null)  
+       {  
+          @response
+                                                         
+       } 
+@code {
+    private string url;
+    private string content;
+    private string response;
+    
+    private void Send()
+    {
+        response = null;
+        response = HttpSupport.SendHook(url, "POST", Define.GetHookData(content));
+        
+    }
+}

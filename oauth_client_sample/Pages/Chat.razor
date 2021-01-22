@@ -1,0 +1,124 @@
+@page "/Chat"
+@using oauth_client_sample.Data
+@using oauth_client_sample.util
+@using oauth_client_sample.Define
+
+<h1>Chat</h1>
+
+<p>This component demonstrates workspace data from a service.</p>
+
+@if (workspaces == null)
+{
+    <p>
+        <em>Need Authorize...</em>
+    </p>
+} 
+else  
+{  
+    
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <select class="custom-select" @onchange="OnWsChanged" title="Workspace is required ">  
+                <option value="Select" selected disabled="disabled">(Choose Workspace)</option>  
+                @foreach (var workspace in workspaces)  
+                {  
+                    <option value="@workspace.Id"> @workspace.Name</option>  
+                }  
+            </select>  
+        </li>
+        @if(ws_id != null)  
+        {  
+            <li class="nav-item px-3">
+                <select class="custom-select" @onchange="OnChChanged" title="Workspace is required ">  
+                    <option value="Select" selected disabled="disabled">(Choose Channel)</option>  
+                    @foreach (var channel in channels)  
+                    {  
+                        <option value="@channel.Id"> @channel.Name</option>  
+                    }  
+                </select>  
+            </li>
+        } 
+       @if(ch_id != null)  
+       {  
+           <li class="nav-item px-3">
+               <input type="text" @bind="content"> <button @onclick="Send">Send</button>
+           </li>
+                                                         
+       } 
+     
+        <li class="nav-item px-3">
+            @if(message != null)  
+               {
+                   
+                   <table class="table">
+                       <thead>
+                       <tr>
+                           <th>Id</th>
+                           <th>Name</th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr>
+                           <td>@message.Id</td>
+                           <td>@message.Name</td>
+           
+                       </tr>
+                       </tbody>
+                   </table>
+                                                                 
+               } 
+        </li>
+    </ul>
+    
+   
+    <br/>
+    
+  
+   
+}  
+
+@code {
+    private Workspace[] workspaces;
+    private Channel[] channels;
+    private string ws_id;
+    private string ch_id;
+    private string content;
+    
+    private Message message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var _tokenInfo = TokenInstance.Instance.GetToken();
+        if (_tokenInfo != null && _tokenInfo.AccessToken != "")
+        {
+            this.workspaces = HttpSupport.SendHttp<Workspace[]>(Define.GetWorkspaceListUrl(), "GET", "", _tokenInfo.AccessToken, "workspaces");
+        }
+    }
+    private void OnWsChanged(ChangeEventArgs e)
+    {
+        ws_id = e.Value.ToString();
+        ch_id = null;
+        GetChannels(ws_id);
+    }
+    private void GetChannels(string ws_id)
+    {
+        var _tokenInfo = TokenInstance.Instance.GetToken();
+        if (_tokenInfo != null && _tokenInfo.AccessToken != "")
+        {
+            this.channels = HttpSupport.SendHttp<Channel[]>(Define.GetChannelListUrl(), "GET", $"workspace_id={ws_id}", _tokenInfo.AccessToken, "channels");
+        }
+    }
+    private void OnChChanged(ChangeEventArgs e)
+    {
+        ch_id = e.Value.ToString();
+    }
+    private void Send()
+    {
+        var _tokenInfo = TokenInstance.Instance.GetToken();
+        if (_tokenInfo != null && _tokenInfo.AccessToken != "")
+        {
+            this.message =HttpSupport.SendHttp<Message>(Define.GetMesageCreateUrl(), "POST", Define.GetChatData(ch_id,content), _tokenInfo.AccessToken, "message");
+        }
+        
+    }
+}

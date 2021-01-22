@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ozTP2cCufASQQRRvbuviON3HV7hhQd/85hDwfdHXrdm2H/xvmGt+xk9tu91jnKpR6rHXizLaZZK9f/RNfddTLg==",
+  "success": true,
+  "projectFilePath": "/Users/brian/Downloads/oauth_client_sample/oauth_client_sample/oauth_client_sample.csproj",
+  "expectedPackageFiles": [
+    "/Users/brian/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
